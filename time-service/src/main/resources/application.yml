@@ -3,7 +3,7 @@ server:
 
 my-register:
   discovery:
-    server-addr: localhost:8180
+    server-addr: ${MY_REGISTER_DISCOVERY_SERVER-ADDR}
   application:
     name: time-service
 

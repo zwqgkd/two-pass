@@ -1,0 +1,58 @@
+services:
+  registry:
+#    image: ghcr.io/zwqgkd/registry-service:latest
+    image: two-pass-register:latest
+    networks:
+      - app-network
+    ports:
+      - "8180:8180"
+
+  provider1:
+#    image: ghcr.io/zwqgkd/time-service:latest
+    image: two-pass-provider:latest
+    ports:
+      - "8280:8280"
+    environment:
+      - MY_REGISTER_DISCOVERY_SERVER-ADDR=registry:8180
+    networks:
+      - app-network
+    depends_on:
+      - registry
+
+  provider2:
+#    image: ghcr.io/zwqgkd/time-service:latest
+    image: two-pass-provider:latest
+    ports:
+      - "8281:8280"
+    environment:
+      - MY_REGISTER_DISCOVERY_SERVER-ADDR=registry:8180
+    networks:
+      - app-network
+    depends_on:
+      - registry
+
+  consumer1:
+#    image: ghcr.io/zwqgkd/client:latest
+    image: two-pass-client:latest
+    ports:
+      - "8300:8300"
+    environment:
+      - MY_REGISTER_DISCOVERY_SERVER-ADDR=registry:8180
+    networks:
+      - app-network
+    depends_on:
+      - registry
+
+  consumer2:
+#    image: ghcr.io/zwqgkd/client:latest
+    image: two-pass-client:latest
+    ports:
+      - "8301:8300"
+    environment:
+      - MY_REGISTER_DISCOVERY_SERVER-ADDR=registry:8180
+    networks:
+      - app-network
+    depends_on:
+      - registry
+networks:
+  app-network:
