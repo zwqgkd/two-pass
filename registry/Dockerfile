@@ -6,4 +6,4 @@ COPY ./target/registry-0.0.1-SNAPSHOT.jar /deploy
 
 EXPOSE 8180
 
-ENTRYPOINT ["sh", "-c", "exec java -jar /deploy/one-pass-0.0.1-SNAPSHOT.jar"]
+ENTRYPOINT ["sh", "-c", "exec java -jar /deploy/registry-0.0.1-SNAPSHOT.jar"]
