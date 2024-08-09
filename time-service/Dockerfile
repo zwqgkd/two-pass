@@ -4,6 +4,6 @@ RUN mkdir -p /deploy
 
 COPY ./target/time-service-0.0.1-SNAPSHOT.jar /deploy
 
-EXPOSE 8281
+EXPOSE 8280
 
 ENTRYPOINT ["sh", "-c", "exec java -jar /deploy/one-pass-0.0.1-SNAPSHOT.jar"]
