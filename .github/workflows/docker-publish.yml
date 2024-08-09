@@ -8,8 +8,8 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME_REGISTRY: ${{ github.repository }}-registry-service
-  IMAGE_NAME_PROVIDE: ${{ github.repository }}-two-pass-time-service
-  IMAGE_NAME_CONSUMER: ${{ github.repository }}-two-pass-client
+  IMAGE_NAME_PROVIDE: ${{ github.repository }}-time-service
+  IMAGE_NAME_CONSUMER: ${{ github.repository }}-client
 
 jobs:
   build:
