@@ -1,0 +1,9 @@
+server:
+  port: 8280
+
+my-register:
+  discovery:
+    server-addr: localhost:8180
+  application:
+    name: time-service
+

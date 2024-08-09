@@ -1,0 +1,9 @@
+server:
+  port: 8300
+
+my-register:
+  discovery:
+    server-addr: localhost:8180
+  application:
+    name: client
+
