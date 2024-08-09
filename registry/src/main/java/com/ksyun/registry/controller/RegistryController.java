@@ -22,7 +22,7 @@ public class RegistryController {
     // 轮询计数器，用于记录每个服务名的轮询位置
     private final Map<String, AtomicInteger> pollingIndex = new ConcurrentHashMap<>();
     private final Map<String, Long> heartbeatTimestamps = new ConcurrentHashMap<>();
-    private static final long HEARTBEAT_TIMEOUT_MS = 10000; // 60 seconds
+    private static final long HEARTBEAT_TIMEOUT_MS = 60000; // 60 seconds
 
     @PostMapping("/register")
     public String register(@RequestBody ServiceInfo serviceInfo) {
