@@ -59,7 +59,7 @@ public class LifeCycleService {
         postToDiscoveryServer("/api/unregister");
     }
 
-    @Scheduled(fixedRate = 30000)
+    @Scheduled(fixedRate = 45000)
     public void heartbeat(){
         log.info("heartbeat service info: serviceName:{}, serviceId:{}," +
                 "host:{}, port:{}", serviceName, serviceId, serviceHost, servicePort);

@@ -1,5 +1,6 @@
 package com.ksyun.registry.controller;
 
+import com.ksyun.registry.model.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,23 +26,25 @@ public class RegistryController {
     private static final long HEARTBEAT_TIMEOUT_MS = 60000; // 60 seconds
 
     @PostMapping("/register")
-    public String register(@RequestBody ServiceInfo serviceInfo) {
+    public Response register(@RequestBody ServiceInfo serviceInfo) {
         serviceNameRegistry.computeIfAbsent(serviceInfo.getServiceName(), k -> new CopyOnWriteArrayList<>())
                 .add(serviceInfo);
 //        heartbeatTimestamps.put(serviceInfo.getServiceId(), System.currentTimeMillis());
 
         log.info("Service registered: {}", serviceInfo.toString());
-        return "Service registered";
+        return new Response(Response.StatusCode.SUCCESS, "Service registered");
     }
 
     @PostMapping("/unregister")
-    public String unregister(@RequestBody ServiceInfo serviceInfo) {
+    public Response unregister(@RequestBody ServiceInfo serviceInfo) {
+        boolean unregistered = false;
         List<ServiceInfo> instances = serviceNameRegistry.get(serviceInfo.getServiceName());
         if (instances != null) {
             for (ServiceInfo instance : instances) {
                 if (instance.getServiceId().equals(serviceInfo.getServiceId()) && instance.getIp().equals(serviceInfo.getIp()) && instance.getPort() == serviceInfo.getPort()) {
                     instances.remove(instance);
                     heartbeatTimestamps.remove(serviceInfo.getServiceId());
+                    unregistered = true;
                     break;
                 }
             }
@@ -49,33 +52,38 @@ public class RegistryController {
                 serviceNameRegistry.remove(serviceInfo.getServiceName());
             }
         }
-        log.info("Service unregistered: {}", serviceInfo.toString());
-        return "Service unregistered";
+        if(!unregistered){
+            log.info("Service instance is not registered before request unregister: {}", serviceInfo.toString());
+            return new Response(Response.StatusCode.FAILURE, "Service not registered");
+        }else{
+            log.info("Service unregistered: {}", serviceInfo.toString());
+            return new Response(Response.StatusCode.SUCCESS, "Service unregistered");
+        }
     }
 
     @PostMapping("/heartbeat")
-    public String heartbeat(@RequestBody ServiceInfo serviceInfo) {
+    public Response heartbeat(@RequestBody ServiceInfo serviceInfo) {
         List<ServiceInfo> allInstances=new ArrayList<>();
         serviceNameRegistry.values().forEach(allInstances::addAll);
         if(allInstances.stream().noneMatch(item->item.getServiceId().equals(serviceInfo.getServiceId()) && item.getIp().equals(serviceInfo.getIp()) && item.getPort()==serviceInfo.getPort())){
             log.info("Service instance is not registered before request hearbeat: {}", serviceInfo.toString());
-            return "Service not registered";
+            return new Response(Response.StatusCode.FAILURE, "Service not registered");
         }
         //如果是第一次记录时间
         if(!heartbeatTimestamps.containsKey(serviceInfo.getServiceId())){
             heartbeatTimestamps.put(serviceInfo.getServiceId(), System.currentTimeMillis());
             log.info("First heartbeat received: {}", serviceInfo.toString());
-            return "First heartbeat received";
+            return new Response(Response.StatusCode.SUCCESS, "First heartbeat received");
         }else{
             long now = System.currentTimeMillis();
             if (now - heartbeatTimestamps.get(serviceInfo.getServiceId()) > HEARTBEAT_TIMEOUT_MS) {
                 this.unregister(serviceInfo);
                 log.info("Heartbeat timeout, then unregistered: {}", serviceInfo.toString());
-                return "Heartbeat timeout, then unregistered";
+                return new Response(Response.StatusCode.FAILURE, "Heartbeat timeout, then unregistered");
             }
             heartbeatTimestamps.put(serviceInfo.getServiceId(), System.currentTimeMillis());
             log.info("Heartbeat received: {}", serviceInfo.toString());
-            return "";
+            return new Response(Response.StatusCode.SUCCESS, "Heartbeat received");
         }
     }
 
