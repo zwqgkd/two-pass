@@ -4,12 +4,12 @@ services:
     networks:
       - app-network
     ports:
-      - "8180:8180"
+      - "50022:8180"
 
   provider1:
     image: ghcr.io/zwqgkd/two-pass-time-service:latest
     ports:
-      - "8280:8280"
+      - "50121:8280"
     environment:
       - MY_REGISTER_DISCOVERY_SERVER-ADDR=registry:8180
     networks:
@@ -20,7 +20,7 @@ services:
   provider2:
     image: ghcr.io/zwqgkd/two-pass-time-service:latest
     ports:
-      - "8281:8280"
+      - "50222:8280"
     environment:
       - MY_REGISTER_DISCOVERY_SERVER-ADDR=registry:8180
     networks:
@@ -31,7 +31,7 @@ services:
   consumer1:
     image: ghcr.io/zwqgkd/two-pass-client:latest
     ports:
-      - "8300:8300"
+      - "50371:8300"
     environment:
       - MY_REGISTER_DISCOVERY_SERVER-ADDR=registry:8180
     networks:
@@ -42,7 +42,7 @@ services:
   consumer2:
     image: ghcr.io/zwqgkd/two-pass-client:latest
     ports:
-      - "8301:8300"
+      - "50472:8300"
     environment:
       - MY_REGISTER_DISCOVERY_SERVER-ADDR=registry:8180
     networks:
