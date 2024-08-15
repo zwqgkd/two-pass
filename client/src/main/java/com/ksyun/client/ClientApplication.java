@@ -18,6 +18,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 
@@ -73,7 +76,20 @@ public class ClientApplication {
                         null,
                         DateTimeResponse.class
                 );
-                response.setResult("Hello Kingsoft Cloud Star Camp - [" + responseEntity.getBody().get(0).getServiceId() + "] - " + Objects.requireNonNull(timeResponseEntity.getBody()).getResult());
+                String gmtTimeStr =Objects.requireNonNull(timeResponseEntity.getBody()).getResult();
+                //tranform time to beijing time
+                // 创建一个DateTimeFormatter来解析GMT时间字符串
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneId.of("GMT"));
+
+                // 解析字符串以创建ZonedDateTime对象
+                ZonedDateTime gmtZonedDateTime = ZonedDateTime.parse(gmtTimeStr, formatter);
+
+                // 将GMT时间转换为北京时间
+                ZonedDateTime beijingTime = gmtZonedDateTime.withZoneSameInstant(ZoneId.of("Asia/Shanghai"));
+
+                String beijingTimeStr = beijingTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+
+                response.setResult("Hello Kingsoft Cloud Star Camp - [" + responseEntity.getBody().get(0).getServiceId() + "] - " + beijingTimeStr);
             }
             return response;
         }
